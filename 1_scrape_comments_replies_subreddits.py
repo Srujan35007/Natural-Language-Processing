@@ -21,33 +21,26 @@ def get_comments_and_replies(subreddit_name):
         submission_count = 0
         write_file.write('submission_id<::>parent_id<::>comment_id<::>comment_body<::>comment_score\n'.upper())
         for submission in sub.top('all', limit=999):
-            try:
-                submission_count += 1
-                for comment in submission.comments.list():
-                    try:
-                        submission_id = str(submission.id)
-                        if submission_id not in submission_ids:   
-                            parent_id = str(comment.parent())
-                            comment_id = str(comment.id)
-                            content = str(comment.body).replace('\n', '<NEWLINE>')
-                            write_file.write(f"{submission_id}<::>{parent_id}<::>{comment_id}<::>{content}<::>{comment.score}\n")
-                            count += 1
-                            if count == 1:
-                                print(cyan(f"Started scraping {subreddit_name}"))
-                            elif count % 10000 == 0:
-                                time_taken = time.time()/60-start_time/60
-                                ETA = (1-submission_count/999)/(submission_count/999)*time_taken
-                                print("%d Comments downloaded.\t%.2f Mins. passed.\t%.2f Comments/Min."%(count, time_taken, count/time_taken), end='\t')
-                                print(bold(cyan(f'({submission_count}/999)')), yellow(f'ETA: {round(ETA,2)} Mins.'))
-                            else:
-                                pass
-                            submission_ids.append(submission_id)
-                        else:
-                            pass
-                    except Exception as E:
-                        print(yellow(str(E)))
-            except Exception as E2:
-                print(yellow(str(E2)))
+            submission_count += 1
+            for comment in submission.comments.list():
+                try:
+                    submission_id = str(submission.id)
+                    parent_id = str(comment.parent())
+                    comment_id = str(comment.id)
+                    content = str(comment.body).replace('\n', '<NEWLINE>')
+                    write_file.write(f"{submission_id}<::>{parent_id}<::>{comment_id}<::>{content}<::>{comment.score}\n")
+                    count += 1
+                    if count == 1:
+                        print(cyan(f"Started scraping {subreddit_name}"))
+                    elif count % 10000 == 0:
+                        time_taken = time.time()/60-start_time/60
+                        ETA = (1-submission_count/999)/(submission_count/999)*time_taken
+                        print("%d Comments downloaded.\t%.2f Mins. passed.\t%.2f Comments/Min."%(count, time_taken, count/time_taken), end='\t')
+                        print(bold(cyan(f'({submission_count}/999)')), yellow(f'ETA: {round(ETA,2)} Mins.'))
+                    else:
+                        pass
+                except Exception as E:
+                    pass
                 
     print(bold(red(f"Total comments from {subreddit_name} = {count}\n\n")))
                     
